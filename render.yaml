@@ -1,7 +1,1 @@
-services:
-  - type: web
-    name: talkito
-    env: node
-    plan: free
-    buildCommand: "npm install"
-    startCommand: "node server.js"
+
