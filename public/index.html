@@ -1,105 +1,63 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Talkito (tipo Talkomatic)</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Talkito Simple</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .hidden { display: none; }
+    #chat { border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; }
+  </style>
 </head>
 <body>
-  <div class="card" id="join-card">
-    <h1>🗨️ Talkito</h1>
-    <p>Entra a una sala y chatea en tiempo real.</p>
-    <form id="join">
-      <label>Tu nombre
-        <input id="name" required placeholder="Ej: Julián">
-      </label>
-      <label>Sala
-        <input id="room" required placeholder="Ej: amigos" value="lobby">
-      </label>
-      <button type="button" id="join-btn">Entrar</button>
-    </form>
+  <div id="join-card">
+    <h2>Entrar al Chat</h2>
+    <input id="name" placeholder="Tu nombre"><br><br>
+    <input id="room" placeholder="Sala"><br><br>
+    <button id="join-btn">Entrar</button>
   </div>
 
-  <div class="card hidden" id="chat-card">
-    <header>
-      <h2 id="room-title"></h2>
-      <div id="status"></div>
-    </header>
-    <ul id="messages"></ul>
-    <form id="send">
-      <input id="text" autocomplete="off" placeholder="Escribe..." />
-      <button>Enviar</button>
-    </form>
+  <div id="chat-card" class="hidden">
+    <h2 id="room-title"></h2>
+    <div id="chat"></div>
+    <input id="msg" placeholder="Escribe un mensaje...">
+    <button id="send-btn">Enviar</button>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    let socket;
-    const $ = (q) => document.querySelector(q);
-    const joinCard = $('#join-card');
-    const chatCard = $('#chat-card');
-    const roomTitle = $('#room-title');
-    const status = $('#status');
-    const messages = $('#messages');
-    const send = $('#send');
-    const text = $('#text');
+    document.addEventListener("DOMContentLoaded", () => {
+      let socket;
+      const joinBtn = document.getElementById('join-btn');
+      const sendBtn = document.getElementById('send-btn');
+      const chat = document.getElementById('chat');
 
-    document.getElementById('join-btn').addEventListener('click', () => {
-      const name = $('#name').value.trim() || 'Anónimo';
-      const room = $('#room').value.trim() || 'lobby';
+      joinBtn.addEventListener('click', () => {
+        const name = document.getElementById('name').value.trim() || "Anónimo";
+        const room = document.getElementById('room').value.trim() || "lobby";
 
-      socket = io({ query: { name, room } });
+        socket = io({ query: { name, room } });
 
-      roomTitle.textContent = 'Sala: ' + room;
-      joinCard.classList.add('hidden');
-      chatCard.classList.remove('hidden');
-      text.focus();
+        document.getElementById('join-card').classList.add('hidden');
+        document.getElementById('chat-card').classList.remove('hidden');
+        document.getElementById('room-title').textContent = "Sala: " + room;
 
-      socket.on('connect', () => status.textContent = 'Conectado');
-      socket.on('disconnect', () => status.textContent = 'Desconectado');
-      socket.on('system', (msg) => addSystem(msg));
-      socket.on('chat', (data) => addMessage(data.name, data.msg));
-      socket.on('typing', ({name, isTyping}) => {
-        status.textContent = isTyping ? (name + ' está escribiendo...') : 'Conectado';
+        socket.on('message', (msg) => {
+          const p = document.createElement('p');
+          p.textContent = msg;
+          chat.appendChild(p);
+          chat.scrollTop = chat.scrollHeight;
+        });
       });
 
-      text.addEventListener('input', () => {
-        if (socket && socket.connected) socket.emit('typing', text.value.length > 0);
+      sendBtn.addEventListener('click', () => {
+        const msgInput = document.getElementById('msg');
+        if (msgInput.value.trim() !== "") {
+          socket.emit('chatMessage', msgInput.value);
+          msgInput.value = "";
+        }
       });
     });
-
-    send.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!socket) return;
-      const msg = text.value.trim();
-      if (!msg) return;
-      socket.emit('chat', msg);
-      addMessage('Tú', msg);
-      text.value = '';
-      socket.emit('typing', false);
-      text.focus();
-    });
-
-    function addMessage(name, msg) {
-      const li = document.createElement('li');
-      li.innerHTML = '<strong>' + escapeHtml(name) + ':</strong> ' + linkify(escapeHtml(msg));
-      messages.appendChild(li);
-      messages.scrollTop = messages.scrollHeight;
-    }
-    function addSystem(msg) {
-      const li = document.createElement('li');
-      li.className = 'sys';
-      li.textContent = msg;
-      messages.appendChild(li);
-      messages.scrollTop = messages.scrollHeight;
-    }
-    function escapeHtml(s) {
-      return s.replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',\"'\":'&#39;'}[c]));
-    }
-    function linkify(s) {
-      return s.replace(/(https?:\/\/[^\s]+)/g, '<a href=\"$1\" target=\"_blank\" rel=\"noopener\">$1</a>');
-    }
   </script>
 </body>
 </html>
