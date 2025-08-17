@@ -1,39 +1,23 @@
-const path = require('path');
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: '*' }
-});
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 
-const PORT = process.env.PORT || 3000;
-
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 io.on('connection', (socket) => {
-  const { room = 'lobby', name = 'Anónimo' } = socket.handshake.query;
+  const { name, room } = socket.handshake.query;
   socket.join(room);
-  socket.data.name = name;
+  socket.to(room).emit('message', name + ' se unió a la sala');
 
-  io.to(room).emit('system', `${socket.data.name} se conectó`);
-
-  socket.on('chat', (msg) => {
-    const trimmed = String(msg || '').slice(0, 500);
-    io.to(room).emit('chat', { name: socket.data.name, msg: trimmed, ts: Date.now(), id: socket.id });
-  });
-
-  socket.on('typing', (isTyping) => {
-    socket.to(room).emit('typing', { name: socket.data.name, isTyping: !!isTyping });
+  socket.on('chatMessage', (msg) => {
+    io.to(room).emit('message', name + ': ' + msg);
   });
 
   socket.on('disconnect', () => {
-    io.to(room).emit('system', `${socket.data.name} salió`);
+    io.to(room).emit('message', name + ' salió de la sala');
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`✅ Servidor listo en http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+http.listen(PORT, () => console.log('Servidor corriendo en puerto ' + PORT));
