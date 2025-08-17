@@ -1,15 +1,1 @@
-:root { --pad: 16px; }
-* { box-sizing: border-box; }
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f6f7fb; margin: 0; padding: var(--pad); }
-.card { max-width: 720px; margin: 0 auto; background: white; padding: var(--pad); border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,.08); }
-.hidden { display: none; }
-h1, h2 { margin: 4px 0 12px; }
-label { display:block; margin-bottom: 10px; font-size: 14px; }
-input { width: 100%; margin-top: 6px; padding: 10px 12px; border: 1px solid #e6e6e6; border-radius: 10px; outline: none; }
-button { padding: 10px 14px; border: 0; border-radius: 10px; cursor: pointer; background: #3b82f6; color: white; }
-header { display:flex; align-items:center; justify-content: space-between; gap: 12px; }
-#messages { list-style: none; padding: 0; margin: 12px 0; max-height: 60vh; overflow: auto; border: 1px solid #eee; border-radius: 12px; padding: 8px; background: #fafafa; }
-#messages li { padding: 6px 8px; }
-#messages li.sys { color: #666; font-style: italic; }
-#send { display:flex; gap: 8px; }
-#text { flex:1; }
+
