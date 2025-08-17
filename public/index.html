@@ -46,7 +46,9 @@
     const send = $('#send');
     const text = $('#text');
 
-    join.addEventListener('submit', (e) => {
+    document.getElementById('join-btn').addEventListener('click', () => {
+  const name = $('#name').value.trim() || 'Anónimo';
+  const room = $('#room').value.trim() || 'lobby';
       e.preventDefault();
       const name = $('#name').value.trim() || 'Anónimo';
       const room = $('#room').value.trim() || 'lobby';
