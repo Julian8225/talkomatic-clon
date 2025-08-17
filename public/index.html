@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Talkito</title>
+  <title>Talkito (tipo Talkomatic)</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -37,7 +37,6 @@
   <script>
     let socket;
     const $ = (q) => document.querySelector(q);
-    const join = $('#join');
     const joinCard = $('#join-card');
     const chatCard = $('#chat-card');
     const roomTitle = $('#room-title');
@@ -47,9 +46,6 @@
     const text = $('#text');
 
     document.getElementById('join-btn').addEventListener('click', () => {
-  const name = $('#name').value.trim() || 'Anónimo';
-  const room = $('#room').value.trim() || 'lobby';
-      e.preventDefault();
       const name = $('#name').value.trim() || 'Anónimo';
       const room = $('#room').value.trim() || 'lobby';
 
